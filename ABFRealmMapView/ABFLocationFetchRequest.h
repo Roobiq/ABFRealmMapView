@@ -31,6 +31,10 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSPredicate * NSPredicateForCoordinateRegion(MKCoordinateRegion region,
                                                     NSString *latitudeKeyPath,
                                                     NSString *longitudeKeyPath);
+
+extern NSString * NSPredicateStringForCoordinateRegion(MKCoordinateRegion region,
+                                                       NSString *latitudeKeyPath,
+                                                       NSString *longitudeKeyPath);
 NS_ASSUME_NONNULL_END
 
 /**

@@ -82,6 +82,41 @@ NSPredicate * NSPredicateForCoordinateRegion(MKCoordinateRegion region,
     return predicate;
 }
 
+NSString * NSPredicateStringForCoordinateRegion(MKCoordinateRegion region,
+                                                NSString *latitudeKeyPath,
+                                                NSString *longitudeKeyPath)
+{
+    CLLocationDegrees centerLat = region.center.latitude;
+    CLLocationDegrees centerLong = region.center.longitude;
+    CLLocationDegrees latDelta = region.span.latitudeDelta;
+    CLLocationDegrees longDelta = region.span.longitudeDelta;
+    CLLocationDegrees halfLatDelta = latDelta/2;
+    CLLocationDegrees halfLongDelta = longDelta/2;
+    CLLocationDegrees maxLat = centerLat + halfLatDelta;
+    CLLocationDegrees minLat = centerLat - halfLatDelta;
+    CLLocationDegrees maxLong = centerLong + halfLongDelta;
+    CLLocationDegrees minLong = centerLong - halfLongDelta;
+    
+    CLLocationCoordinate2D bottomLeft = CLLocationCoordinate2DMake(minLat, minLong);
+    CLLocationCoordinate2D topRight = CLLocationCoordinate2DMake(maxLat, maxLong);
+    
+    NSString *latitudePredicateString = [NSString stringWithFormat:@"%@ BETWEEN {%f, %f}", latitudeKeyPath, bottomLeft.latitude, topRight.latitude];
+    // The coordinate pair represents two possible boxes due to the discontinuity in longitudes at the 180th meridian.
+    // We always interpret the bounding box as smallest of the two alternatives.
+    NSString *longitudePredicateString = nil;
+    if (topRight.longitude - bottomLeft.longitude <= 180) {
+        longitudePredicateString = [NSString stringWithFormat:@"%@ BETWEEN {%f, %f}", longitudeKeyPath, bottomLeft.longitude, topRight.longitude];
+    }
+    else {
+        longitudePredicateString = [NSString stringWithFormat:@"%@ BETWEEN {-180, %f} OR %@ BETWEEN {%f, 180}", longitudeKeyPath, bottomLeft.longitude, longitudeKeyPath, topRight.longitude];
+    }
+    
+    NSString *predicateString =
+    [NSString stringWithFormat:@"%@ AND %@",latitudePredicateString, longitudePredicateString];
+    
+    return predicateString;
+}
+
 #pragma mark - ABFLocationFetchRequest
 
 @implementation ABFLocationFetchRequest

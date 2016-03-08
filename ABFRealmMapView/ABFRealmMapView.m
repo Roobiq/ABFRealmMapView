@@ -328,6 +328,8 @@ static NSString * const ABFAnnotationViewReuseId = @"ABFAnnotationViewReuseId";
 }
 
 #if TARGET_OS_IPHONE
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 - (MKOverlayView *)mapView:(MKMapView *)mapView viewForOverlay:(id <MKOverlay>)overlay
 {
     id<MKMapViewDelegate> delegate = self.externalDelegate;
@@ -347,6 +349,7 @@ static NSString * const ABFAnnotationViewReuseId = @"ABFAnnotationViewReuseId";
         [delegate mapView:mapView didAddOverlayViews:overlayViews];
     }
 }
+#pragma GCC diagnostic pop
 #endif
 
 #pragma mark - Setters
